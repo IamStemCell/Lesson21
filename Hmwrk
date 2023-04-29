@@ -61,3 +61,57 @@ class TestFileCountManager(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+import unittest
+import os
+from tempfile import TemporaryDirectory
+
+
+class TestFileContManager(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = TemporaryDirectory()
+        self.file_path = os.path.join(self.temp_dir.name, 'test.txt')
+    
+    def tearDown(self):
+        self.temp_dir.cleanup()
+    
+    def test_file_creation(self):
+        with FileContManager(self.file_path, 'w') as f:
+            self.assertTrue(os.path.exists(self.file_path))
+            self.assertEqual(f.mode, 'w')
+    
+    def test_file_writing(self):
+        with FileContManager(self.file_path, 'w') as f:
+            f.write('Hello, world!')
+        with open(self.file_path) as f:
+            self.assertEqual(f.read(), 'Hello, world!')
+    
+    def test_file_reading(self):
+        with open(self.file_path, 'w') as f:
+            f.write('Hello, world!')
+        with FileContManager(self.file_path, 'r') as f:
+            self.assertEqual(f.read(), 'Hello, world!')
+    
+    def test_exception_handling(self):
+        with self.assertRaises(Exception):
+            with FileContManager(self.file_path, 'r') as f:
+                1 / 0
+    
+    def test_multiple_instances(self):
+        with FileContManager(self.file_path, 'w') as f1:
+            f1.write('Hello, world!')
+            with FileContManager(self.file_path, 'r') as f2:
+                self.assertEqual(f2.read(), 'Hello, world!')
+            f1.write('Goodbye, world!')
+        with open(self.file_path) as f:
+            self.assertEqual(f.read(), 'Hello, world!Goodbye, world!')
+    
+    def test_context_manager_exit(self):
+        with self.assertRaises(AttributeError):
+            with FileContManager(self.file_path, 'w') as f:
+                raise AttributeError()
+        self.assertFalse(os.path.exists(self.file_path))
+
+if __name__ == '__main__':
+    unittest.main()
