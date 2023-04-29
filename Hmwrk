@@ -1,0 +1,32 @@
+#Task 1 
+#File Context Manager class
+#Create your own class, which can behave like a built-in function `open`.
+#Also, you need to extend its functionality with counter and logging.
+#Pay special attention to the implementation of `__exit__` method,
+#which has to cover all the requirements to context managers.
+
+class FileContManager:
+    def __init__(self, file_path, mode):
+        self.file_path = file_path
+        self.mode = mode
+        self.file_obj = None
+        self.counter = 0
+    
+    def __enter__(self):
+        self.file_obj = open(self.file_path, self.mode)
+        self.counter += 1
+        return self.file_obj
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.counter -= 1
+        self.file_obj.close()
+        if exc_type is not None:
+            logging.error(f"Exception {exc_type} occurred in context manager for file {self.file_path}")
+            return False
+        return True
+
+
+#Приклад використання:
+
+with FileContManager("newfile.txt", "w") as file:
+    file.write("Hello, Python world!")
