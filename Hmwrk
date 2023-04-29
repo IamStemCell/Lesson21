@@ -45,3 +45,10 @@ class TestFileCountManager(unittest.TestCase):
             fcm.write('Hello, world!')
         with open('test.txt', 'r') as f:
             self.assertEqual(f.read(), 'Hello, world!')
+
+    def test_file_already_exists(self):
+        with open('test.txt', 'w') as f:
+            f.write('This is an existing file.')
+        with self.assertRaises(FileExistsError):
+            with FileCountManager('test.txt', 'w') as fcm:
+                pass
