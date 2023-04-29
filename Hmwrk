@@ -57,3 +57,7 @@ class TestFileCountManager(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             with FileCountManager('test.txt', 'w') as fcl:
                 raise RuntimeError('Test error')
+
+
+if __name__ == '__main__':
+    unittest.main()
