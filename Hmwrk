@@ -52,3 +52,8 @@ class TestFileCountManager(unittest.TestCase):
         with self.assertRaises(FileExistsError):
             with FileCountManager('test.txt', 'w') as fcm:
                 pass
+
+    def test_runtime_error(self):
+        with self.assertRaises(RuntimeError):
+            with FileCountManager('test.txt', 'w') as fcl:
+                raise RuntimeError('Test error')
