@@ -30,3 +30,18 @@ class FileContManager:
 
 with FileContManager("newfile.txt", "w") as file:
     file.write("Hello, Python world!")
+
+
+
+#Task2
+import unittest
+import os
+from python_practice import FileContManager
+
+class TestFileCountManager(unittest.TestCase):
+
+    def test_file_open_and_close(self):
+        with FileCountManager('test.txt', 'w') as fcm:
+            fcm.write('Hello, world!')
+        with open('test.txt', 'r') as f:
+            self.assertEqual(f.read(), 'Hello, world!')
