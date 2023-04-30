@@ -36,7 +36,7 @@ with FileContManager("newfile.txt", "w") as file:
 #копія коду з попереднього таску (можна було зробити імпорт класу з файлу, так зручніше) 
 
 import unittest
-
+import os
 class FileContManager: 
     def __init__(self, file_name, mode):
         self.file_name = file_name
@@ -92,18 +92,27 @@ class TestFileContManager(unittest.TestCase):
             self.assertEqual(log.records[1].getMessage(), 'Exiting FileContManager context')
 
 
-#Task2
+    def test_invalid_file_path(self):
+        with self.assertRaises(FileNotFoundError):
+            with FileContManager('nonexistent_file.txt', 'r'):
+                pass
 
+    def test_invalid_file_mode(self):
+        with self.assertRaises(ValueError):
+            with FileContextManager('test.txt', 'invalid_mode'):
+                pass
 
-class TestFileContManager(unittest.TestCase):
-
-    
-
-
-    def test_runtime_error(self):
+    def test_runtime_error_in_context(self):
         with self.assertRaises(RuntimeError):
-            with FileContManager('test.txt', 'w') as fcl:
-                raise RuntimeError('Test error')
+            with FileContManager('testing1.txt', 'w') as file:
+                file.write('Some random text')
+                raise RuntimeError('Runtime error in context')
+
+    def test_runtime_error_in_exit(self):
+        with self.assertRaises(RuntimeError):
+            with FileContManager('testing1.txt', 'w') as file:
+                file.write('Some random text')
+                os.remove('testing1.txt')
 
 
 if __name__ == '__main__':
