@@ -5,6 +5,9 @@
 #Pay special attention to the implementation of `__exit__` method,
 #which has to cover all the requirements to context managers.
 
+
+python_practice_L_21.py
+
 class FileContManager:
     def __init__(self, file_path, mode):
         self.file_path = file_path
@@ -36,7 +39,7 @@ with FileContManager("newfile.txt", "w") as file:
 #Task2
 import unittest
 import os
-from python_practice import FileContManager
+from python_practice_L_21.py import FileContManager
 
 class TestFileContManager(unittest.TestCase):
 
@@ -66,7 +69,7 @@ if __name__ == '__main__':
 import unittest
 import os
 from tempfile import TemporaryDirectory
-
+from python_practice_L_21.py import FileContManager
 
 class TestFileContManager(unittest.TestCase):
     def setUp(self):
