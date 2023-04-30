@@ -38,10 +38,10 @@ import unittest
 import os
 from python_practice import FileContManager
 
-class TestFileCountManager(unittest.TestCase):
+class TestFileContManager(unittest.TestCase):
 
     def test_file_open_and_close(self):
-        with FileCountManager('test.txt', 'w') as fcm:
+        with FileContManager('test.txt', 'w') as fcm:
             fcm.write('Hello, world!')
         with open('test.txt', 'r') as f:
             self.assertEqual(f.read(), 'Hello, world!')
@@ -50,12 +50,12 @@ class TestFileCountManager(unittest.TestCase):
         with open('test.txt', 'w') as f:
             f.write('This is an existing file.')
         with self.assertRaises(FileExistsError):
-            with FileCountManager('test.txt', 'w') as fcm:
+            with FileContManager('test.txt', 'w') as fcm:
                 pass
 
     def test_runtime_error(self):
         with self.assertRaises(RuntimeError):
-            with FileCountManager('test.txt', 'w') as fcl:
+            with FileContManager('test.txt', 'w') as fcl:
                 raise RuntimeError('Test error')
 
 
