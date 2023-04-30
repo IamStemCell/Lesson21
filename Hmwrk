@@ -6,55 +6,99 @@
 #which has to cover all the requirements to context managers.
 
 
-python_practice_L_21.py
-
-class FileContManager:
-    def __init__(self, file_path, mode):
-        self.file_path = file_path
+class FileContManager: 
+    def __init__(self, file_name, mode):
+        self.file_name = file_name
         self.mode = mode
-        self.file_obj = None
         self.counter = 0
     
     def __enter__(self):
-        self.file_obj = open(self.file_path, self.mode)
+        self.file = open(self.file_name, self.mode)
         self.counter += 1
-        return self.file_obj
+        logging.info(f'File {self.file_name} was opened for {self.mode} mode. Current counter is: {self.counter}')
+        return self.file
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.counter -= 1
-        self.file_obj.close()
+        self.file.close()
+        self.counter -= 1 
+        logging.info(f'File {self.file_name} was closed. Current counter is: {self.counter}')
         if exc_type is not None:
-            logging.error(f"Exception {exc_type} occurred in context manager for file {self.file_path}")
-            return False
+            logging.exception(f'Exception {exc_type} has occurred in custom context manager for file {self.file_name} with value {exc_val}.')    
         return True
-
 
 #Приклад використання:
 
 with FileContManager("newfile.txt", "w") as file:
-    file.write("Hello, Python world!")
+    file.write('Hello, Python's custom context manager world!')
 
 
+#Task2 
+#копія коду з попереднього таску (можна було зробити імпорт класу з файлу, так зручніше) 
 
-#Task2
 import unittest
-import os
-from python_practice_L_21.py import FileContManager
+
+class FileContManager: 
+    def __init__(self, file_name, mode):
+        self.file_name = file_name
+        self.mode = mode
+        self.counter = 0
+    
+    def __enter__(self):
+        self.file = open(self.file_name, self.mode)
+        self.counter += 1
+        logging.info(f'File {self.file_name} was opened for {self.mode} mode. Current counter is: {self.counter}')
+        return self.file
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.file.close()
+        self.counter -= 1 
+        logging.info(f'File {self.file_name} was closed. Current counter is: {self.counter}')
+        if exc_type is not None:
+            logging.exception(f'Exception {exc_type} has occurred in custom context manager for file {self.file_name} with value {exc_val}.')    
+        return True
+
+#самі тести
 
 class TestFileContManager(unittest.TestCase):
 
-    def test_file_open_and_close(self):
-        with FileContManager('test.txt', 'w') as fcm:
-            fcm.write('Hello, world!')
-        with open('test.txt', 'r') as f:
-            self.assertEqual(f.read(), 'Hello, world!')
+    def test_file_read(self):
+        # Test reading from file
+        with FileContManager('newfile.txt', 'r') as f:
+            self.assertEqual(f.read(), 'Hello, Python's custom context manager world!\n')
 
-    def test_file_already_exists(self):
-        with open('test.txt', 'w') as f:
-            f.write('This is an existing file.')
-        with self.assertRaises(FileExistsError):
-            with FileContManager('test.txt', 'w') as fcm:
+    def test_file_write(self):
+        # Test writing to file
+        with FileContManager('newfile.txt', 'w') as f:
+            f.write('Hello, Beetroot!\n')
+        
+        # Verify that the file was written to
+        with open('newfile.txt', 'r') as f:
+            self.assertEqual(f.read(), 'Hello, Beetroot!\n')
+
+    def test_file_counter(self):
+        # Test counter +1 на вхід і -1 на вихід 
+        self.assertEqual(FileContManager.counter, 0)
+        with FileContManager('newfile.txt', 'r') as f:
+            self.assertEqual(FileContManager.counter, 1)
+        self.assertEqual(FileContManager.counter, 0)
+
+    def test_file_logging(self):
+        # Test logging на вхід і вихід 
+        with self.assertLogs() as log:
+            with FileContManager('newfile.txt', 'r') as f:
                 pass
+            self.assertEqual(len(log.records), 2)
+            self.assertEqual(log.records[0].getMessage(), 'Entering FileContManager context')
+            self.assertEqual(log.records[1].getMessage(), 'Exiting FileContManager context')
+
+
+#Task2
+
+
+class TestFileContManager(unittest.TestCase):
+
+    
+
 
     def test_runtime_error(self):
         with self.assertRaises(RuntimeError):
@@ -66,55 +110,3 @@ if __name__ == '__main__':
     unittest.main()
 
 
-import unittest
-import os
-from tempfile import TemporaryDirectory
-from python_practice_L_21.py import FileContManager
-
-class TestFileContManager(unittest.TestCase):
-    def setUp(self):
-        self.temp_dir = TemporaryDirectory()
-        self.file_path = os.path.join(self.temp_dir.name, 'test.txt')
-    
-    def tearDown(self):
-        self.temp_dir.cleanup()
-    
-    def test_file_creation(self):
-        with FileContManager(self.file_path, 'w') as f:
-            self.assertTrue(os.path.exists(self.file_path))
-            self.assertEqual(f.mode, 'w')
-    
-    def test_file_writing(self):
-        with FileContManager(self.file_path, 'w') as f:
-            f.write('Hello, world!')
-        with open(self.file_path) as f:
-            self.assertEqual(f.read(), 'Hello, world!')
-    
-    def test_file_reading(self):
-        with open(self.file_path, 'w') as f:
-            f.write('Hello, world!')
-        with FileContManager(self.file_path, 'r') as f:
-            self.assertEqual(f.read(), 'Hello, world!')
-    
-    def test_exception_handling(self):
-        with self.assertRaises(Exception):
-            with FileContManager(self.file_path, 'r') as f:
-                1 / 0
-    
-    def test_multiple_instances(self):
-        with FileContManager(self.file_path, 'w') as f1:
-            f1.write('Hello, world!')
-            with FileContManager(self.file_path, 'r') as f2:
-                self.assertEqual(f2.read(), 'Hello, world!')
-            f1.write('Goodbye, world!')
-        with open(self.file_path) as f:
-            self.assertEqual(f.read(), 'Hello, world!Goodbye, world!')
-    
-    def test_context_manager_exit(self):
-        with self.assertRaises(AttributeError):
-            with FileContManager(self.file_path, 'w') as f:
-                raise AttributeError()
-        self.assertFalse(os.path.exists(self.file_path))
-
-if __name__ == '__main__':
-    unittest.main()
