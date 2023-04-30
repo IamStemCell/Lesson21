@@ -33,11 +33,19 @@ with FileContManager("newfile.txt", "w") as file:
 
 
 #Task2 
-#копія коду з попереднього таску (можна було зробити імпорт класу з файлу, так зручніше) 
+#Writing tests for context manager
+
+#Take your implementation of the context manager class from Task 1 and write tests for it.
+#Try to cover as many use cases as you can, positive ones when a file exists and everything works as designed.
+#And also, write tests when your class raises errors or you have errors in the runtime context suite.
+
 
 import unittest
 import os
-class FileContManager: 
+
+
+class FileContManager: #копія коду з попереднього таску (можна було зробити імпорт класу з файлу, але для наочності тестів так зручніше) 
+
     def __init__(self, file_name, mode):
         self.file_name = file_name
         self.mode = mode
@@ -57,7 +65,6 @@ class FileContManager:
             logging.exception(f'Exception {exc_type} has occurred in custom context manager for file {self.file_name} with value {exc_val}.')    
         return True
 
-#самі тести
 
 class TestFileContManager(unittest.TestCase):
 
